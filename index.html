@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>I am Sorry Bettu 🥺❤️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;600;700&family=Sacramento&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #260f2a 0%, #110515 60%, #08020a 100%);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    /* Ambient glow elements */
+    .glow-sphere {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    .glow-1 {
+      width: 380px;
+      height: 380px;
+      background: #ff3377;
+      top: -100px;
+      right: -100px;
+      animation: floatGlow 12s ease-in-out infinite alternate;
+    }
+    .glow-2 {
+      width: 420px;
+      height: 420px;
+      background: #9933ff;
+      bottom: -120px;
+      left: -100px;
+      animation: floatGlow 15s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, 40px) scale(1.15); }
+    }
+
+    /* Overlay UI Layer */
+    .ui-container {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 18px;
+      pointer-events: none;
+    }
+
+    /* Top Header */
+    .top-badge {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 20px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(255, 45, 117, 0.2);
+      animation: fadeInDown 1.2s ease-out;
+      pointer-events: auto;
+    }
+    .top-badge span {
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #ff85b3;
+    }
+
+    /* Main Interaction Card */
+    .card-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      pointer-events: auto;
+    }
+
+    .glass-card {
+      background: rgba(24, 10, 30, 0.65);
+      border: 1px solid rgba(255, 140, 185, 0.25);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 28px;
+      padding: 28px 22px 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 45, 120, 0.2);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transform-origin: center bottom;
+      animation: cardAppear 1s ease-out;
+      width: 100%;
+    }
+
+    @keyframes cardAppear {
+      0% { opacity: 0; transform: translateY(30px) scale(0.92); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .badge-icon {
+      font-size: 32px;
+      margin-bottom: 6px;
+      display: inline-block;
+      animation: pulseSad 2.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseSad {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15) rotate(-5deg); }
+    }
+
+    h1.title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 42px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 20%, #ff85be 60%, #ff2d75 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #f7cfe0;
+      margin-bottom: 16px;
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    .message-box {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      border: 1px dashed rgba(255, 120, 175, 0.3);
+      font-size: 14px;
+      line-height: 1.6;
+      color: #ffe6f0;
+      position: relative;
+    }
+
+    .message-box strong {
+      color: #ff99cc;
+    }
+
+    .quote-icon {
+      font-family: 'Sacramento', cursive;
+      font-size: 26px;
+      color: #ff66aa;
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* Buttons Container */
+    .button-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+      min-height: 54px;
+    }
+
+    .btn {
+      padding: 12px 26px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      outline: none;
+    }
+
+    .btn-yes {
+      background: linear-gradient(135deg, #ff3377, #ff6699);
+      color: #fff;
+      box-shadow: 0 8px 25px rgba(255, 51, 119, 0.5);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .btn-yes:hover, .btn-yes:active {
+      transform: scale(1.06);
+      box-shadow: 0 12px 30px rgba(255, 51, 119, 0.7);
+    }
+
+    .btn-no {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e5b0c8;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    /* Forgiven view */
+    .forgiven-view {
+      display: none;
+      animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.7); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .forgiven-view h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 38px;
+      color: #ff66a3;
+      margin-bottom: 8px;
+    }
+
+    .promise-list {
+      text-align: left;
+      font-size: 13.5px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      line-height: 1.8;
+      color: #ffd6e8;
+    }
+
+    .promise-list li {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Bottom Hint & Audio Controls */
+    .bottom-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 440px;
+      pointer-events: auto;
+      gap: 12px;
+    }
+
+    .hint-chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 8px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      color: #ffb8d6;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sound-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .sound-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* 3D Drag hint */
+    .rotate-hint {
+      position: absolute;
+      top: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: rgba(255, 200, 225, 0.7);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+      animation: pulseText 3s infinite ease-in-out;
+      z-index: 5;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(0.97); }
+      50% { opacity: 0.95; transform: translateX(-50%) scale(1.03); }
+    }
+
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile tweaks */
+    @media (max-height: 700px) {
+      .glass-card { padding: 20px 16px 18px; }
+      h1.title { font-size: 34px; }
+      .message-box { font-size: 13px; padding: 10px 12px; margin-bottom: 12px; }
+      .rotate-hint { top: 14%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient glowing spheres -->
+  <div class="glow-sphere glow-1"></div>
+  <div class="glow-sphere glow-2"></div>
+
+  <!-- 3D WebGL Canvas -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <div class="rotate-hint">✨ Drag 3D Heart or Tap to Beat ✨</div>
+
+  <!-- UI Container -->
+  <div class="ui-container">
+    <div class="top-badge">
+      <span>For My Special Bettu 💌</span>
+    </div>
+
+    <div class="card-wrapper">
+      <!-- Main Apology Card -->
+      <div class="glass-card" id="apology-card">
+        <div class="badge-icon">🥺</div>
+        <h1 class="title">I'm Sorry Bettu...</h1>
+        <p class="subtitle">I never wanted to hurt you or make you upset.</p>
+        
+        <div class="message-box">
+          Mujhse galti ho gayi Bettu, please mujhe maaf kar do na... 💔<br>
+          Aapki ek smile mere poore din ko roshan kar deti hai, aur aapka gussa meri jaan le leta hai.
+          <span class="quote-icon">"I promise to always value & love you, Bettu!"</span>
+        </div>
+
+        <div class="button-group" id="btn-group">
+          <button class="btn btn-yes" id="yesBtn" onclick="handleForgive()">
+            <span>Maan Gayi na? 🥰</span>
+          </button>
+          <button class="btn btn-no" id="noBtn" onmouseover="dodgeNo()" onclick="dodgeNo()" ontouchstart="dodgeNo(event)">
+            <span>Nahi 😤</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Forgiven Card (revealed on YES) -->
+      <div class="glass-card forgiven-view" id="forgiven-card">
+        <div style="font-size: 42px; margin-bottom: 8px;">💖🥰✨</div>
+        <h2>Yay! Thank You Bettu!</h2>
+        <p class="subtitle" style="color: #ffc4dc; font-weight: 500;">You are the sweetest, most precious gift in my life! ❤️</p>
+        
+        <ul class="promise-list">
+          <li>🌸 No more silly mistakes, pakka promise!</li>
+          <li>🍫 Unlimited hugs, chocolates & ice cream!</li>
+          <li>💌 Hamesha aapki har baat sununga.</li>
+          <li>💍 Always by your side, forever and always.</li>
+        </ul>
+
+        <button class="btn btn-yes" onclick="heartExplosion()" style="width: 100%; margin-top: 6px;">
+          Send Lots of Love to You 💕
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="bottom-controls">
+      <div class="hint-chip">
+        <span>Made with ❤️ for Bettu</span>
+      </div>
+      <button class="sound-btn" id="musicToggleBtn" onclick="toggleMusic()">
+        <span id="soundIcon">🎵</span> <span id="soundText">Soft Melody</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================
+       1. THREE.JS 3D SCENE SETUP: Heart & Floating Dust
+       ======================================================== */
+    const canvas = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    
+    // Camera
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 7.5;
+    camera.position.y = 0.5;
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffb3d9, 1.2);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0xff3377, 2.8);
+    dirLight1.position.set(5, 5, 5);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x9933ff, 2.2);
+    dirLight2.position.set(-5, -3, 3);
+    scene.add(dirLight2);
+
+    const pointLight = new THREE.PointLight(0xff66cc, 3.5, 20);
+    pointLight.position.set(0, 0, 3);
+    scene.add(pointLight);
+
+    // Group for Heart and surrounding orbits
+    const heartGroup = new THREE.Group();
+    scene.add(heartGroup);
+
+    // Generate 3D Heart Shape using parametric extrusion
+    const x = 0, y = 0;
+    const heartShape = new THREE.Shape();
+    heartShape.moveTo(x + 0.25, y + 0.25);
+    heartShape.bezierCurveTo(x + 0.25, y + 0.25, x + 0.20, y, x, y);
+    heartShape.bezierCurveTo(x - 0.35, y, x - 0.35, y + 0.35, x - 0.35, y + 0.35);
+    heartShape.bezierCurveTo(x - 0.35, y + 0.55, x - 0.15, y + 0.77, x + 0.25, y + 1.0);
+    heartShape.bezierCurveTo(x + 0.65, y + 0.77, x + 0.85, y + 0.55, x + 0.85, y + 0.35);
+    heartShape.bezierCurveTo(x + 0.85, y + 0.35, x + 0.85, y, x + 0.5, y);
+    heartShape.bezierCurveTo(x + 0.35, y, x + 0.25, y + 0.25, x + 0.25, y + 0.25);
+
+    const extrudeSettings = {
+      depth: 0.45,
+      bevelEnabled: true,
+      bevelSegments: 16,
+      steps: 3,
+      bevelSize: 0.18,
+      bevelThickness: 0.2
+    };
+
+    const heartGeometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+    heartGeometry.center();
+    // Rotate so pointed tip points downwards
+    heartGeometry.rotateZ(Math.PI);
+
+    // Heart Material with deep ruby / pink reflections & sheen
+    const heartMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xff1e62,
+      emissive: 0x550a24,
+      roughness: 0.15,
+      metalness: 0.2,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.1,
+      reflectivity: 0.9,
+      transmission: 0.25,
+      ior: 1.5
+    });
+
+    const heartMesh = new THREE.Mesh(heartGeometry, heartMaterial);
+    heartMesh.scale.set(1.9, 1.9, 1.9);
+    heartMesh.position.y = 1.0;
+    heartGroup.add(heartMesh);
+
+    // Inner glowing wireframe for 3D magic look
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0xff88cc,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.15
+    });
+    const wireHeart = new THREE.Mesh(heartGeometry, wireMat);
+    wireHeart.scale.set(1.95, 1.95, 1.95);
+    wireHeart.position.y = 1.0;
+    heartGroup.add(wireHeart);
+
+    // Floating Little Satellites (Tiny 3D hearts/spheres orbiting)
+    const smallHearts = [];
+    const smallHeartGeom = new THREE.SphereGeometry(0.08, 16, 16);
+    const smallHeartMat = new THREE.MeshStandardMaterial({
+      color: 0xff99cc,
+      emissive: 0xff3388,
+      emissiveIntensity: 0.8,
+      roughness: 0.2
+    });
+
+    for(let i = 0; i < 28; i++) {
+      const orb = new THREE.Mesh(smallHeartGeom, smallHeartMat);
+      const angle = (i / 28) * Math.PI * 2;
+      const radius = 2.2 + Math.sin(i * 3) * 0.8;
+      orb.position.set(
+        Math.cos(angle) * radius,
+        1.0 + Math.sin(angle * 2) * 0.9,
+        Math.sin(angle) * radius
+      );
+      orb.userData = {
+        speed: 0.008 + (i % 5) * 0.003,
+        angle: angle,
+        radius: radius,
+        yBase: 1.0 + (Math.random() - 0.5) * 1.5
+      };
+      heartGroup.add(orb);
+      smallHearts.push(orb);
+    }
+
+    // Background Star/Dust Particles
+    const starCount = 450;
+    const starGeom = new THREE.BufferGeometry();
+    const starPositions = new Float32Array(starCount * 3);
+    const starColors = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount * 3; i += 3) {
+      starPositions[i] = (Math.random() - 0.5) * 22;
+      starPositions[i + 1] = (Math.random() - 0.5) * 22;
+      starPositions[i + 2] = (Math.random() - 0.5) * 18;
+
+      // Romantic gradient colors: pinks, purples, golds
+      const choice = Math.random();
+      if(choice < 0.5) {
+        starColors[i] = 1.0; starColors[i+1] = 0.4; starColors[i+2] = 0.7; // Pink
+      } else if(choice < 0.8) {
+        starColors[i] = 0.7; starColors[i+1] = 0.4; starColors[i+2] = 1.0; // Purple
+      } else {
+        starColors[i] = 1.0; starColors[i+1] = 0.85; starColors[i+2] = 0.5; // Gold
+      }
+    }
+
+    starGeom.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    starGeom.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+    const starMaterial = new THREE.PointsMaterial({
+      size: 0.09,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
+    });
+
+    const starField = new THREE.Points(starGeom, starMaterial);
+    scene.add(starField);
+
+    // Mouse / Touch Rotation Interaction
+    let isDragging = false;
+    let prevMousePos = { x: 0, y: 0 };
+    let targetRotationX = 0;
+    let targetRotationY = 0;
+    let currentRotationX = 0;
+    let currentRotationY = 0;
+
+    function onPointerDown(e) {
+      isDragging = true;
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const y = e.clientY || (e.touches && e.touches[0].clientY);
+      prevMousePos = { x, y };
+      triggerHeartBeat();
+    }
+
+    function onPointerMove(e) {
+      if (!isDragging) {
+        // Soft hover effect
+        const x = (e.clientX || (e.touches && e.touches[0].clientX) || 0) / window.innerWidth - 0.5;
+        const y = (e.clientY || (e.touches && e.touches[0].clientY) || 0) / window.innerHeight - 0.5;
+        targetRotationY = x * 0.8;
+        targetRotationX = y * 0.5;
+        return;
+      }
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      const deltaX = clientX - prevMousePos.x;
+      const deltaY = clientY - prevMousePos.y;
+
+      targetRotationY += deltaX * 0.008;
+      targetRotationX += deltaY * 0.008;
+      prevMousePos = { x: clientX, y: clientY };
+    }
+
+    function onPointerUp() {
+      isDragging = false;
+    }
+
+    window.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    window.addEventListener('touchstart', onPointerDown, { passive: true });
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('touchend', onPointerUp, { passive: true });
+
+    // Click/tap on heart triggers pulse and particle heart
+    function triggerHeartBeat() {
+      pulseScale = 1.35;
+      playBeepTone(440, 0.15);
+    }
+
+    // Animation Loop
+    let clock = new THREE.Clock();
+    let pulseScale = 1.0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsedTime = clock.getElapsedTime();
+
+      // Smooth lerp rotation
+      currentRotationX += (targetRotationX - currentRotationX) * 0.08;
+      currentRotationY += (targetRotationY - currentRotationY) * 0.08;
+
+      heartGroup.rotation.x = currentRotationX + Math.sin(elapsedTime * 0.8) * 0.08;
+      heartGroup.rotation.y = currentRotationY + elapsedTime * 0.35;
+
+      // Natural heartbeat rhythm
+      const naturalBeat = Math.sin(elapsedTime * 3.5);
+      const doubleBeat = naturalBeat > 0.6 ? 1.0 + (naturalBeat - 0.6) * 0.25 : 1.0;
+      
+      // Decay manual click pulse
+      pulseScale += (1.0 - pulseScale) * 0.1;
+      const totalScale = 1.9 * doubleBeat * pulseScale;
+      heartMesh.scale.set(totalScale, totalScale, totalScale);
+      wireHeart.scale.set(totalScale * 1.03, totalScale * 1.03, totalScale * 1.03);
+
+      // Light flicker
+      pointLight.intensity = 3.0 + Math.sin(elapsedTime * 7) * 0.9;
+
+      // Rotate small orbiting orbs
+      smallHearts.forEach((orb) => {
+        orb.userData.angle += orb.userData.speed;
+        orb.position.x = Math.cos(orb.userData.angle) * orb.userData.radius;
+        orb.position.z = Math.sin(orb.userData.angle) * orb.userData.radius;
+        orb.position.y = orb.userData.yBase + Math.sin(orb.userData.angle * 2) * 0.4;
+      });
+
+      // Slowly rotate starfield
+      starField.rotation.y = -elapsedTime * 0.04;
+      starField.rotation.x = elapsedTime * 0.02;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Window Resize Handling
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+
+    /* ========================================================
+       2. INTERACTIVE BUTTON DODGING (Naughty "Nahi" button)
+       ======================================================== */
+    const noBtn = document.getElementById('noBtn');
+    let dodgeCount = 0;
+    const sadMessages = [
+      "Aise mat bolo na Bettu 🥺",
+      "Pakka ab kabhi nahi karunga 🥺👉👈",
+      "Ek baar maaf kar do na please ❤️",
+      "Itna gussa accha nahi hota Bettu 🥰",
+      "Main sachhi ro padunga ab 😭",
+      "Aap meri sabse pyari ho na? 💕"
+    ];
+
+    function dodgeNo(e) {
+      if (e) e.preventDefault();
+      dodgeCount++;
+
+      // Change button text progressively
+      const msgIndex = (dodgeCount - 1) % sadMessages.length;
+      noBtn.querySelector('span').innerText = sadMessages[msgIndex];
+
+      // Random displacement
+      const maxX = Math.min(window.innerWidth * 0.35, 120);
+      const maxY = 65;
+      const randomX = (Math.random() - 0.5) * maxX * 2;
+      const randomY = (Math.random() - 0.5) * maxY * 2;
+
+      noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${Math.max(0.75, 1 - dodgeCount * 0.05)})`;
+      
+      // Make Yes button bigger and glow more enticingly!
+      const yesBtn = document.getElementById('yesBtn');
+      const yesScale = Math.min(1.4, 1.0 + dodgeCount * 0.08);
+      yesBtn.style.transform = `scale(${yesScale})`;
+
+      // Trigger sad wobble on 3D heart
+      targetRotationX += (Math.random() - 0.5) * 0.6;
+      targetRotationY += (Math.random() - 0.5) * 0.8;
+      playBeepTone(280, 0.1);
+    }
+
+    /* ========================================================
+       3. FORGIVENESS & CONFETTI CELEBRATION
+       ======================================================== */
+    function handleForgive() {
+      // Confetti burst
+      confetti({
+        particleCount: 120,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ['#ff3377', '#ff99cc', '#ffd700', '#ffffff', '#a855f7']
+      });
+
+      // Side cannons
+      setTimeout(() => {
+        confetti({
+          particleCount: 60,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#ff3377', '#ffd700', '#ff66aa']
+        });
+        confetti({
+          particleCount: 60,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#ff3377', '#ffd700', '#ff66aa']
+        });
+      }, 250);
+
+      // Swap cards
+      document.getElementById('apology-card').style.display = 'none';
+      const forgivenCard = document.getElementById('forgiven-card');
+      forgivenCard.style.display = 'block';
+
+      // 3D Heart jumps with joy
+      pulseScale = 2.0;
+      targetRotationY += Math.PI * 2;
+
+      // Start music if not already playing
+      if (!isMusicPlaying) {
+        startGentleMelody();
+      }
+    }
+
+    function heartExplosion() {
+      confetti({
+        particleCount: 160,
+        spread: 120,
+        origin: { y: 0.65 },
+        shapes: ['circle'],
+        colors: ['#ff1744', '#ff4081', '#f50057', '#ff80ab', '#ffffff']
+      });
+      pulseScale = 2.2;
+      playBeepTone(523.25, 0.2); // C5
+      setTimeout(() => playBeepTone(659.25, 0.25), 120); // E5
+      setTimeout(() => playBeepTone(783.99, 0.35), 240); // G5
+    }
+
+    /* ========================================================
+       4. PROCEDURAL WEB AUDIO SYNTHESIZER (Gentle Romantic Melody)
+       No external audio files needed — 100% reliable!
+       ======================================================== */
+    let audioCtx = null;
+    let isMusicPlaying = false;
+    let melodyInterval = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playBeepTone(freq, duration = 0.2) {
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Romantic music-box notes sequence (pentatonic peaceful melody)
+    const melodyNotes = [
+      { f: 523.25, d: 0.6 }, // C5
+      { f: 587.33, d: 0.6 }, // D5
+      { f: 659.25, d: 0.8 }, // E5
+      { f: 783.99, d: 0.9 }, // G5
+      { f: 659.25, d: 0.6 }, // E5
+      { f: 587.33, d: 0.6 }, // D5
+      { f: 523.25, d: 1.0 }, // C5
+      { f: 440.00, d: 0.8 }, // A4
+      { f: 523.25, d: 1.2 }  // C5
+    ];
+    let noteIdx = 0;
+
+    function startGentleMelody() {
+      initAudio();
+      isMusicPlaying = true;
+      document.getElementById('soundIcon').innerText = '🔊';
+      document.getElementById('soundText').innerText = 'Playing';
+
+      if (melodyInterval) clearInterval(melodyInterval);
+      melodyInterval = setInterval(() => {
+        if (!isMusicPlaying) return;
+        const note = melodyNotes[noteIdx % melodyNotes.length];
+        playChime(note.f, note.d);
+        noteIdx++;
+      }, 750);
+    }
+
+    function stopGentleMelody() {
+      isMusicPlaying = false;
+      if (melodyInterval) clearInterval(melodyInterval);
+      document.getElementById('soundIcon').innerText = '🎵';
+      document.getElementById('soundText').innerText = 'Soft Melody';
+    }
+
+    function toggleMusic() {
+      if (isMusicPlaying) {
+        stopGentleMelody();
+      } else {
+        startGentleMelody();
+      }
+    }
+
+    function playChime(freq, duration) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.09, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Auto-init audio context on first user tap/click
+    window.addEventListener('click', () => {
+      initAudio();
+    }, { once: true });
+    window.addEventListener('touchstart', () => {
+      initAudio();
+    }, { once: true });
+  </script>
+</body>
+</html>
